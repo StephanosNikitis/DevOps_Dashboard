@@ -216,7 +216,7 @@ export default function HomePage() {
             <p className="font-jetbrains text-[13px] text-[#8b949e] leading-relaxed mb-10 max-w-md">
               Metrics, logs, deployments and alerts — unified in one dashboard,
               streaming over SSE, stored in Redis and Postgres. Built without
-              Datadog. Runs on the free tier of everything.
+              Datadog.
             </p>
 
             <div className="flex items-center gap-4">
