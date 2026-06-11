@@ -1,0 +1,52 @@
+# Runs on every push to main and every pull request.
+# Does three things:
+#   1. Type-checks with TypeScript
+#   2. Lints with ESLint (via next lint)
+#   3. Builds the Next.js app
+#
+# WHY THIS MATTERS FOR THE DASHBOARD
+# Once your GitHub webhook is configured (Settings → Webhooks → Workflow runs),
+# GitHub will send a `workflow_run` event to /api/webhook/github every time
+# this workflow runs. That's what populates the CI/CD Pipeline panel with
+# REAL data - no simulate button needed in production.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Type-check, lint & build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          # Real credentials only needed at runtime — dummies are fine for build
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://x:x@localhost/x' }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL || 'https://x.upstash.io' }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN || 'placeholder' }}
+          GITHUB_WEBHOOK_SECRET: "placeholder"
